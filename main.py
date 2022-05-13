@@ -9,6 +9,8 @@ SELECT tvl, day FROM demo_table
 table_data = gu.load_dataframe(gu.LoadDataframeType.SQL, sql)
 
 
+
+
 def calc_diff(df, base_column, periods, sort_column):
     df.set_index(sort_column)
     return df[base_column].diff(periods=periods)
@@ -16,7 +18,10 @@ def calc_diff(df, base_column, periods, sort_column):
 
 def pct_change(df, base_column, date_column, periods=1, freq=None):
     df[base_column].index = pd.to_datetime(df[date_column])
-    return df[base_column].pct_change(periods=periods, freq=freq)
+    return df[base_column].pct_change(periods=periods, freq=freq).reset_index()[base_column]
+
+
+
 
 
 df = table_data.copy(deep=True)
