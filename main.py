@@ -9,24 +9,25 @@ SELECT tvl, day FROM demo_table
 table_data = gu.load_dataframe(gu.LoadDataframeType.SQL, sql)
 
 
+
+
 def calc_diff(df, base_column, periods, sort_column):
     df.set_index(sort_column)
-    res = base_column.diff(periods=periods)
-    return res
+    return df[base_column].diff(periods=periods)
 
 
 def pct_change(df, base_column, date_column, periods=1, freq=None):
-    date_column = pd.to_datetime(date_column)
-    base_column.index = date_column
-    res = base_column.pct_change(periods=periods, freq=freq)
-    res.index = df.index
-    return res
+    df[base_column].index = pd.to_datetime(df[date_column])
+    return df[base_column].pct_change(periods=periods, freq=freq).reset_index()[base_column]
+
+
+
 
 
 df = table_data.copy(deep=True)
 
-df['tvl_diff'] = calc_diff(df, df["tvl"], 7, df["day"])
-df['tvl_change'] = pct_change(df, df["tvl"], df["day"], 1, "D")
+df['tvl_diff'] = calc_diff(df, "tvl" , 7,  "day" )
+df['tvl_change'] = pct_change(df, "tvl",  "day" , 1, "D")
 
 df.to_json(orient="split", date_format="iso", date_unit="s", double_precision=4)
 
